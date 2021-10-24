@@ -1,0 +1,100 @@
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.net.HttpURLConnection;
+import java.util.Iterator;
+import java.util.List;
+import java.net.URL;
+import org.openqa.selenium.WebElement;
+
+
+/**
+ *
+ * @author leolam
+ */
+public class CheckBrokenLinks {
+
+    /** check broken links of the web site 
+     */
+    
+    public static void main (String[] args){
+    System.setProperty("webdriver.chrome.driver","./src/resources/chromedriver");
+    WebDriver driver = new ChromeDriver();
+    driver.manage().window().maximize();
+    driver.get("https://crypto.com/nft");
+    
+    List<WebElement> Links = driver.findElements(By.tagName("a"));
+    System.out.println("No of links = "+ Links.size());
+    
+    for(int i=0; i<Links.size(); i++)
+    {
+        WebElement E1 = Links.get(i);
+        String url= E1.getAttribute("href");
+        verifyLinks(url);
+    }
+    
+    driver.quit();
+    
+    }
+
+    public static void verifyLinks(String linkurl) {
+        try
+        {
+            URL url = new URL(linkurl);
+            HttpURLConnection httpURLConnect=(HttpURLConnection)url.openConnection();
+            httpURLConnect.setConnectTimeout(5000);
+            httpURLConnect.connect();
+            if(httpURLConnect.getResponseCode()>=400)
+            {
+                System.out.println(linkurl+ " - "+httpURLConnect.getResponseCode()+ " - Broken link");
+            }
+            else
+            {
+                System.out.println(linkurl+ " - "+httpURLConnect.getResponseCode());
+            }
+           
+        }catch (Exception e){
+            
+        }
+     
+    } 
+    
+    
+public Class CheckBrokenImages{
+    public static void sec(String[] args){
+        System.setProperty("webdriver.chrome.driver", "./src/resources/chromedriver");
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://crypto.com/nft");
+        
+        List<WebElement> images = driver.findElements(By.tagName("img"));
+        System.out.println("No of Images = "+images.size());
+        
+        for (int index=0; index<images.size(); index++){
+            WebElement image = images.get(index);
+            String imageURL = image.getAttribute("src");
+            System.out.println("URL of Image "+ (index+1)+ ":"+ imageURL);
+            verifyLinks(imageURL);
+            
+            try{
+                boolean imageDisplayed = (Boolean)((JavascriptExecutor) driver).executeScript("return (typeof arguments[0].naturalWidth !=\"undefined\" && arguments[0].naturalWidth >0);", image);
+            if (imageDisplayed){
+                System.out.println("Image display pass");
+            }
+            else{
+                System.out.println("Image display fail");
+            }
+                
+            }catch(Exception e){
+            System.out.println("Error occured");
+            }
+        }
+        driver.quit();    
+        
+    }
+}
+    
